@@ -39,6 +39,14 @@ const getAllProducts = async (req: Request, res: Response) => {
       searchTerm as string,
     );
 
+    if (result.length === 0) {
+      res.status(400).json({
+        status: false,
+        message: 'Product not found',
+      });
+      return;
+    }
+
     res.status(200).json({
       status: true,
       message: 'Products fetched successfully!',

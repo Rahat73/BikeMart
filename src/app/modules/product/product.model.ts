@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, UpdateWriteOpResult } from 'mongoose';
 import {
   ProductMethods,
   ProductModel,
@@ -81,7 +81,7 @@ productSchema.methods.isProductAvailable = async function (
   const productToOrder = await Product.findOne({ _id: id });
   const productsInInventory: number = productToOrder?.inventory.quantity || 0;
 
-  let updatedInfo: any;
+  let updatedInfo: UpdateWriteOpResult;
 
   if (productsInInventory > quantity) {
     updatedInfo = await Product.updateOne(

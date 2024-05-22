@@ -82,7 +82,7 @@ const updateProductInfo = async (req: Request, res: Response) => {
       zodParsedData,
     );
 
-    if (result.modifiedCount === 0) {
+    if (result.matchedCount === 0) {
       res.status(400).json({
         status: false,
         message: 'Product not found',
@@ -91,10 +91,12 @@ const updateProductInfo = async (req: Request, res: Response) => {
       return;
     }
 
+    const updatedProduct = await ProductService.getProductByIDFromDB(productId);
+
     res.status(200).json({
       status: true,
       message: 'Product updated successfully!',
-      data: result,
+      data: updatedProduct,
     });
   } catch (error) {
     res.status(400).json({
@@ -110,10 +112,21 @@ const deleteProduct = async (req: Request, res: Response) => {
     const { productId } = req.params;
     const result = await ProductService.deleteProductFromDB(productId);
 
+    if (result.deletedCount === 0) {
+      res.status(400).json({
+        status: false,
+        message: 'Product not found',
+        data: null,
+      });
+      return;
+    }
+
+    const deletedProduct = await ProductService.getProductByIDFromDB(productId);
+
     res.status(200).json({
       status: true,
       message: 'Product deleted successfully!',
-      data: result,
+      data: deletedProduct,
     });
   } catch (error) {
     res.status(400).json({

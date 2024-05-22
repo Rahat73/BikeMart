@@ -24,7 +24,20 @@ const createProduct = async (req: Request, res: Response) => {
 
 const getAllProducts = async (req: Request, res: Response) => {
   try {
-    const result = await ProductService.getAllProductsFromDB();
+    const { searchTerm } = req.query;
+
+    if (searchTerm && typeof searchTerm !== 'string') {
+      res.status(400).json({
+        status: false,
+        message: 'Invalid search term',
+        data: null,
+      });
+      return;
+    }
+
+    const result = await ProductService.getAllProductsFromDB(
+      searchTerm as string,
+    );
 
     res.status(200).json({
       status: true,

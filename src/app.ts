@@ -11,6 +11,10 @@ app.use('/api/products', ProductRoutes);
 
 app.use('/api/orders', OrderRoutes);
 
+app.use('/', (req: Request, res: Response) => {
+  res.status(200).send('Welcome to the API');
+});
+
 // Route not found handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({

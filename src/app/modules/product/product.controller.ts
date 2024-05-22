@@ -57,8 +57,32 @@ const getProductByID = async (req: Request, res: Response) => {
   }
 };
 
+const updateProductInfo = async (req: Request, res: Response) => {
+  try {
+    const { productId } = req.params;
+    const updatedDoc = req.body;
+    const result = await ProductService.updateProductInfoIntoDB(
+      productId,
+      updatedDoc,
+    );
+
+    res.status(200).json({
+      status: true,
+      message: 'Product updated successfully!',
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: false,
+      message: 'Something went wrong',
+      error,
+    });
+  }
+};
+
 export const ProductController = {
   createProduct,
   getAllProducts,
   getProductByID,
+  updateProductInfo,
 };

@@ -1,5 +1,11 @@
 import { Schema, model } from 'mongoose';
-import { TInventory, TProduct, TVariant } from './product.interface';
+import {
+  ProductMethods,
+  ProductModel,
+  TInventory,
+  TProduct,
+  TVariant,
+} from './product.interface';
 
 const variantSchema = new Schema<TVariant>(
   {
@@ -29,35 +35,54 @@ const inventorySchema = new Schema<TInventory>(
   { _id: false },
 );
 
-const productSchema = new Schema<TProduct>({
-  name: {
-    type: String,
-    required: true,
+const productSchema = new Schema<TProduct, ProductModel, ProductMethods>(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    category: {
+      type: String,
+      required: true,
+    },
+    tags: {
+      type: [String],
+      required: true,
+    },
+    variants: {
+      type: [variantSchema],
+      required: true,
+    },
+    inventory: {
+      type: inventorySchema,
+      required: true,
+    },
   },
-  description: {
-    type: String,
-    required: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  category: {
-    type: String,
-    required: true,
-  },
-  tags: {
-    type: [String],
-    required: true,
-  },
-  variants: {
-    type: [variantSchema],
-    required: true,
-  },
-  inventory: {
-    type: inventorySchema,
-    required: true,
-  },
-});
+  { versionKey: false },
+);
 
-export const Product = model('Product', productSchema);
+productSchema.index({ name: 'text' });
+
+//checking the ordered quantity of product is available in inventory or not
+productSchema.methods.isProductAvailable = async function (
+  id: string,
+  quantity: number,
+) {
+  const productToOrder = await Product.findOne({ _id: id });
+  const productsInInventory: number = productToOrder?.inventory.quantity || 0;
+  if (productsInInventory >= quantity) {
+    return true;
+  }
+  return false;
+};
+
+export const Product = model<TProduct, ProductModel>('Product', productSchema);

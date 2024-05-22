@@ -8,7 +8,7 @@ const createProductIntoDB = async (productData: TProduct) => {
 
 const getAllProductsFromDB = async (searchTerm: string) => {
   const result = searchTerm
-    ? await Product.find({ name: searchTerm.trim() })
+    ? await Product.find({ $text: { $search: searchTerm } })
     : await Product.find();
   return result;
 };

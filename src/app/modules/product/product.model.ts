@@ -85,4 +85,19 @@ productSchema.methods.isProductAvailable = async function (
   return false;
 };
 
+//updating a product inventory after order is placed
+productSchema.methods.updateProductInventory = async function (
+  id: string,
+  quantity: number,
+) {
+  const updatedInfo = await Product.updateOne(
+    { _id: id },
+    { $inc: { 'inventory.quantity': -quantity } },
+  );
+  if (updatedInfo.modifiedCount === 1) {
+    return true;
+  }
+  return false;
+};
+
 export const Product = model<TProduct, ProductModel>('Product', productSchema);

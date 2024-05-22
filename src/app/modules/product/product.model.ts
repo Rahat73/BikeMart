@@ -73,31 +73,36 @@ const productSchema = new Schema<TProduct, ProductModel, ProductMethods>(
 productSchema.index({ name: 'text' });
 
 //checking the ordered quantity of product is available in inventory or not
+//updating a product inventory after order is placed
 productSchema.methods.isProductAvailable = async function (
   id: string,
   quantity: number,
 ) {
   const productToOrder = await Product.findOne({ _id: id });
   const productsInInventory: number = productToOrder?.inventory.quantity || 0;
-  if (productsInInventory >= quantity) {
-    return true;
-  }
-  return false;
-};
 
-//updating a product inventory after order is placed
-productSchema.methods.updateProductInventory = async function (
-  id: string,
-  quantity: number,
-) {
-  const updatedInfo = await Product.updateOne(
-    { _id: id },
-    { $inc: { 'inventory.quantity': -quantity } },
-  );
-  if (updatedInfo.modifiedCount === 1) {
-    return true;
-  }
-  return false;
+  let updatedInfo: any;
+
+  if (productsInInventory > quantity) {
+    updatedInfo = await Product.updateOne(
+      { _id: id },
+      { $inc: { 'inventory.quantity': -quantity } },
+    );
+  } else if (productsInInventory === quantity) {
+    updatedInfo = await Product.updateOne(
+      { _id: id },
+      {
+        $set: {
+          'inventory.quantity': 0,
+          'inventory.inStock': false,
+        },
+      },
+    );
+  } else return false;
+
+  if (updatedInfo.modifiedCount === 0) throw new Error('Something went wrong');
+
+  return true;
 };
 
 export const Product = model<TProduct, ProductModel>('Product', productSchema);

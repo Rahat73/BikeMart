@@ -82,6 +82,15 @@ const updateProductInfo = async (req: Request, res: Response) => {
       zodParsedData,
     );
 
+    if (result.modifiedCount === 0) {
+      res.status(400).json({
+        status: false,
+        message: 'Product not found',
+        data: null,
+      });
+      return;
+    }
+
     res.status(200).json({
       status: true,
       message: 'Product updated successfully!',

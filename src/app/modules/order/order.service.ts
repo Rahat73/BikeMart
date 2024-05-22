@@ -13,8 +13,6 @@ const createOrderIntoDB = async (orderData: TOrder) => {
     throw new Error('Insufficient quantity available in inventory');
   }
 
-  product.updateProductInventory(orderData.productId, orderData.quantity);
-
   const result = await Order.create(orderData);
   return result;
 };

@@ -22,7 +22,6 @@ export type TProduct = {
 
 export type ProductMethods = {
   isProductAvailable(id: string, quantity: number): Promise<boolean | null>;
-  updateProductInventory(id: string, quantity: number): Promise<boolean | null>;
 };
 
 export type ProductModel = Model<
